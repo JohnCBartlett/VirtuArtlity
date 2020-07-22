@@ -3,7 +3,11 @@ const express = require('express'); // require only works with Node.js
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const secret = "s3cr3t";
+// import dotenv
+require('dotenv').config();
+// Bring in environment variable for the secret hash
+// (needed to read the jsonwebtoken)
+const secret = process.env.SECRET;
 
 // Import database models
 const UsersModel = require('../models/UsersModel');
@@ -128,7 +132,15 @@ router.post(
                                 // generate the payload
                                 const payload = { 
                                     id: document.id,
-                                    email: document.email
+                                    firstName: document.firstName,
+                                    lastName: document.lastName,
+                                    email: document.email,
+                                    mPhone: document.mPhone,
+                                    aPhone: document.aPhone,
+                                    country: document.country,
+                                    city: document.city,
+                                    accountType: document.accountType,
+                                    avatar: document.avatar
                                 };
 
                                 // Sign the payload with the secret key and send to user
@@ -168,7 +180,7 @@ router.post(
 
         // set up the users data to update
         const usersData = {
-            _id: req.body._id,
+            _id: req.user._id,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             email: req.body.email,
@@ -223,5 +235,46 @@ router.post(
     }
 );
 
+// A GET route for fetching data from the 'users'collection
+router.get(
+    '/userSettings',
+    (req, res) => {
+        const usersData = {_id: req.user._id}
+
+        // fetch the documents using .find() and id
+        UsersModel.find(
+            {_id: usersData._id },  // search criteria
+            {                           // criteria (keys and values) to return
+                firstName: usersData.firstName,
+                lastName: usersData.lastName,
+                email: usersData.email,
+                mPhone: usersData.mPhone,
+                aPhone: usersData.aPhone,
+                country: usersData.country,
+                city: usersData.city,
+                password: usersData.password,
+                accountType: usersData.accountType,
+                interests: usersData.interests,
+                avatar: usersData.avatar},
+            {}, // options, if any
+            (err, document) => {
+
+                if(err) {
+                    console.log(err);
+                } else {
+                    // 2) If no document with the user id, say can't find user
+                     if(!document) {
+                        res.json({message: 'User not found'});
+                    }
+                
+                    else {      // 3) Otherwise, if user is found, return all user data
+                        res.json({userSettings: document})
+                    }
+                }
+            }
+        );
+
+    }
+);
 
 module.exports = router;

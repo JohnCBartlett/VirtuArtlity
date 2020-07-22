@@ -30,7 +30,7 @@ router.post(
 
                 if(err) {
                     // if error, return an error and send message to console
-                    res.json({message: 'error updating product'});
+                    res.json({message: 'error posting product'});
                     console.log(err);
                 } else {
 
@@ -41,14 +41,14 @@ router.post(
                         const newProductModel = new ProductsModel(productData);
                         newProductModel.save()
 
-                        // if successful then return success messages
+                        // if successful then return success message
                         .then (
                             () => {
                             res.json({message: 'Product POST successfull'});
                             }
                         )
                         
-                        // if error then return error message and post error to console log
+                        // if error then return and display error message
                         .catch(
                             (e) => {
                                 res.json({message: 'Product POST failed'});
@@ -201,7 +201,7 @@ router.post(
 
 // A GET route for fetching data from the 'products'collection
 router.get(
-    '/list',
+    '/',
     (req, res) => {
 
         // fetch all the documents using .find()
@@ -211,7 +211,7 @@ router.get(
         .then (
             (results) => {
                 // res.json = res.send() + converts to JSON
-                res.json(results)
+                res.json({products: results})
             }
         )
 

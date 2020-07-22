@@ -10,11 +10,15 @@ const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
+// import dotenv
+require('dotenv').config();
+
 // import cors for front & backend communications
 const cors = require('cors');
 
-// Setup secret to read jsonwebtoken (must be same as Secret in UsersRoutes)
-const secret = "s3cr3t";
+// Bring in environment variable for the secret hash
+// (needed to read the jsonwebtoken)
+const secret = process.env.SECRET;
 
 // Set up UsersModel so we can find the user in the database with the passport function
 const UsersModel = require('./models/UsersModel');
@@ -80,12 +84,8 @@ server.use(cors());
 // Invoke passportJwt and pass the passport npm package as argument
 passportJwt(passport);
 
-// Enter your database connection URL
-//
-// need to add database connection string here:
-// ****************************************
-const dbURL = "mongodb+srv://admin01:Astr0labz@virtuartlity.95m9h.mongodb.net/VirtuArtlity?retryWrites=true&w=majority"
-// ****************************************
+// Use environment variable db_URL to connect to the database
+const dbURL = process.env.db_URL;
 
 // ----------------------------------------------
 // | connect to MongoDB database using mongoose |
@@ -114,7 +114,7 @@ mongoose.connect(
 // Products routes
 server.use(
     '/products', // translates to http://localhost:8080/products
-    passport.authenticate('jwt', {session:false}), // Use passport-jwt to authenticate
+//    passport.authenticate('jwt', {session:false}), // Use passport-jwt to authenticate
     ProductsRoutes
 );
 
@@ -131,7 +131,6 @@ server.use(
 //    passport.authenticate('jwt', {session:false}), // Use passport-jwt to authenticate
 //    UtilitiesRoutes
 //);
-
 
 // Users routes
 server.use(
@@ -151,64 +150,7 @@ server.use(
     '/newsletter',  // translates to http://localhost:8080/newsletter
     NewsletterRoutes
 )
-// These are just some dummy pages until we can hook up the React landing page
-// create a route for the landing page
-// '/' refers to the HTML/landing page
-// Added some links to other pages (note the + and syntax to link lines)
-//
 
-//***************/
-// Landing page */
-//***************/
-server.get(
-    '/',
-    (req, res) => {
-        res.send(
-            "<h1> Welcome to MyCars.com</h1>" +
-            "<a href='/about'>About</br></a>" +
-            "<a href='/products'>Products</br></a>" +
-            "<a href='/contact'>Contact details</br></a>"
-            );
-    }
-);
-
-//*************************************/
-//* create a route for the about page */
-//*************************************/
-server.get(
-   '/about',
-   (req, res) => {
-       res.send(
-           "<h1> About us</h1>" +
-       "<a href='/'>Home</a>");
-   }
-);
-
-//***************************************/
-//* create a route for the contact page */
-//***************************************/
-server.get(
-   '/contact',
-   (req, res) => {
-       res.send("<h1> These are my contact details</h1>" +
-       "<h3></br>Telephone: 433636363 " +
-       "</br>Address: fhfhgddhh</br></br></h3>" +
-       "<a href='/'>Home</a>");
-   }
-);
-
-//****************************************/
-//* create a route for the products page */
-//****************************************/
-server.get(
-   '/products',
-   (req, res) => {
-       res.send("<h1> This is my product page</h1>" +
-       "</br><h3>item 1 " +
-       "</br>item 2</br></br></h3>"  +
-       "<a href='/'>Home</a>");
-   }
-);
 
 //*******************/
 //* 404 error page */
